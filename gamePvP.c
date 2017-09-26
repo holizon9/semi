@@ -18,6 +18,8 @@ int game_end_message(int turn);  //ゲーム終了メッセージの表示
 
 //void inputtoboard(char input);
 
+
+
 int main(){
 	char input[128];
 	/*ゲーム開始処理*/{
