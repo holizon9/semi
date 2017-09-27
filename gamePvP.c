@@ -1,41 +1,46 @@
+//5.2 ソースコード
+#include <stdlib.h>
 #include<stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 int board[12][12];  //ボード生成
 int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
-int N=128;			//最大手数
+int MAX=128;			//最大手数
 int X,Y;			//ボード上の座標を示す
 void boardclear();  //ボードをクリア
 void printboard();  //標準出力にゲームボードを表示
 void pieceputtoboard(int X,int turn);	//ボードに駒を配置
 int inputerrorcheck(char *input);
-int turnstart();	//ターン開始時の処理をまとめたもの
+int turnstart(int turn);	//ターン開始時の処理をまとめたもの
 int  hexconversion(char *input);
 int victory_decision();  //turn player wins=1 or not=0
 int game_end_message(int turn);  //ゲーム終了メッセージの表示
 
 
 //void inputtoboard(char input);
-
-
-
 int main(){
 	char input[128];
 	/*ゲーム開始処理*/{
 	//この処理は開発時に不要なためコメントアウト
-	if (0){
+	if (1){
 		printf("最大ターンを入力してください\n");
-		scanf("%d",&N);
+		scanf("%d",&MAX);
 	}
 	boardclear();
 	board[0][11]=1;
+	
 	/*ゲーム開始処理おわり*/
 }
 
-	while(turn<N+1){  //ゲーム
+	while(turn<MAX+1){  //ゲーム
 		X=turnstart(turn);
-		printf("X?  ");
+		if(turn%2==1){
+			printf("X? ");
+		}else{
+			printf("O? ");		
+		}
+
+
 		scanf("%s",input);
 
 		while(inputerrorcheck(input)!=1){  //無効な入力の場合再入力を求める
