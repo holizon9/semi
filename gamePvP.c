@@ -141,9 +141,7 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 		if(board[0][X]==0){
 			return 1;
 		}else{
-
 		printf("invalid input\n");
-
 			return -1;
 		}
 	}else{
@@ -208,8 +206,7 @@ int  turnstart(int turn){
 		{
 			for (int j = 0; j < 12; ++j)
 			{
-			/* code */board[i][j]=0;
+			board[i][j]=0;
 			}
-		/* code */
 		}
 	}
