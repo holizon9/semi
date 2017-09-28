@@ -1,11 +1,10 @@
-//5.2 ソースコード
 #include <stdlib.h>
 #include<stdio.h>
 #include <string.h>
 
 int board[12][12];  //ボード生成
 int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
-int MAX=128;			//最大手数
+int MAX=144;			//最大手数
 int X,Y;			//ボード上の座標を示す
 void boardclear();  //ボードをクリア
 void printboard();  //標準出力にゲームボードを表示
@@ -18,15 +17,20 @@ int game_end_message(int turn);  //ゲーム終了メッセージの表示
 
 
 //void inputtoboard(char input);
-int main(){
+int main(int argc,char *argv[]){
+	FILE *fp;
 	char input[128];
 	/*ゲーム開始処理*/{
 	//この処理は開発時に不要なためコメントアウト
-	if (1){
+	if (0){
 		printf("最大ターンを入力してください\n");
 		scanf("%d",&MAX);
 	}
 	boardclear();
+		if ((fp = fopen("kihu.dat", "w")) == NULL) {
+		printf("file open error!!\n");
+		exit(EXIT_FAILURE);	
+	}
 	
 	/*ゲーム開始処理おわり*/
 }
@@ -46,28 +50,34 @@ int main(){
 
 
 		while(inputerrorcheck(input,X)!=1){  //無効な入力の場合再入力を求める
-			printf("X?  ");
+			if(turn%2==1){
+				printf("X? ");
+			}else{
+				printf("O? ");		
+			}
 			scanf("%s",input);
 			X=hexconversion(input);
 
 		}
 		X=hexconversion(input);
 
-		 pieceputtoboard(X,turn);
-		 if(game_end_message(turn)==1){
-		 	break;
-		 }
-
-
-
-
-
-		 turn++;
-
+		pieceputtoboard(X,turn);
+		fprintf(fp, "%d  %d\n",turn,X);
+		if(game_end_message(turn)==1){
+			break;
 		}
-		printboard();
+
+
+
+
+
+		turn++;
 
 	}
+	printboard();
+	fclose(fp);
+
+}
 
 	int victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら1を返す　
 		int i,j;
@@ -97,16 +107,16 @@ int main(){
 	}
 
 	int game_end_message(int turn){
-		 if (victory_decision()==1){
-		 	if (turn%2==1)
-		 	{
-		 		printf("X wins\n");
-		 	}else{
-		 		printf("O wins\n");
-		 	}
-		 	return 1;
-		 }
-		 return 0;
+		if (victory_decision()==1){
+			if (turn%2==1)
+			{
+				printf("X wins\n");
+			}else{
+				printf("O wins\n");
+			}
+			return 1;
+		}
+		return 0;
 
 	}
 
@@ -138,10 +148,10 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 
 	if(!strcmp(input,"A")||!strcmp(input,"B")||(strcmp(input,"/")>0&&strcmp(input,"9")<0))
 	{
-		if(board[0][X]==0){
+		if((board[0][X]==0)&&(X<12)){
 			return 1;
 		}else{
-		printf("invalid input\n");
+			printf("invalid input\n");
 			return -1;
 		}
 	}else{
@@ -206,7 +216,7 @@ int  turnstart(int turn){
 		{
 			for (int j = 0; j < 12; ++j)
 			{
-			board[i][j]=0;
+				board[i][j]=0;
 			}
 		}
 	}
