@@ -10,7 +10,7 @@ int X,Y;			//ボード上の座標を示す
 void boardclear();  //ボードをクリア
 void printboard();  //標準出力にゲームボードを表示
 void pieceputtoboard(int X,int turn);	//ボードに駒を配置
-int inputerrorcheck(char *input);
+int inputerrorcheck(char *input,int X);
 int turnstart(int turn);	//ターン開始時の処理をまとめたもの
 int  hexconversion(char *input);
 int victory_decision();  //turn player wins=1 or not=0
@@ -27,7 +27,6 @@ int main(){
 		scanf("%d",&MAX);
 	}
 	boardclear();
-	board[0][11]=1;
 	
 	/*ゲーム開始処理おわり*/
 }
@@ -42,10 +41,15 @@ int main(){
 
 
 		scanf("%s",input);
+		X=hexconversion(input);
 
-		while(inputerrorcheck(input)!=1){  //無効な入力の場合再入力を求める
+
+
+		while(inputerrorcheck(input,X)!=1){  //無効な入力の場合再入力を求める
 			printf("X?  ");
 			scanf("%s",input);
+			X=hexconversion(input);
+
 		}
 		X=hexconversion(input);
 
@@ -128,13 +132,20 @@ int main(){
 	}
 
 
-int inputerrorcheck(char *input){  //入力が適正でない場合-1を、適正な場合1を返す
+int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を、適正な場合1を返す
 
-	//適正な入力とは、A,B,0~9を指す。
+	//適正な入力とは、A,B,0~9であり、ボード上に配置できる入力とする。
 
 	if(!strcmp(input,"A")||!strcmp(input,"B")||(strcmp(input,"/")>0&&strcmp(input,"9")<0))
 	{
-		return 1;
+		if(board[0][X]==0){
+			return 1;
+		}else{
+
+		printf("invalid input\n");
+
+			return -1;
+		}
 	}else{
 		printf("invalid input\n");
 		return -1;
