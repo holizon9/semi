@@ -2,7 +2,11 @@
 #include<stdio.h>
 #include <string.h>
 #include "game_function.h"
-
+int board[12][12];  //ボード生成
+int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
+int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
+int MAX=128;			//最大手数
+int X,Y;			//ボード上の座標を示す
 
 
 int main(int argc,char *argv[]){
@@ -23,7 +27,6 @@ int main(int argc,char *argv[]){
 	}
 	if(argc==2&&fo==1){
 		printf("棋譜ファイル%sをインポートしました\n",argv[1]);
-		printf("test");
 		while(fscanf(fp, "%d%d",&turn,&X)!=EOF){
 			pieceputtoboard(X, turn);
 		}
@@ -42,7 +45,8 @@ int main(int argc,char *argv[]){
 			printf("O? ");		
 		}
 
-		scanf("%s",input);					//入力処理開始
+
+		scanf("%s",input);		 			//入力処理開始
 		X=hexconversion(input);
 		while(inputerrorcheck(input,X)!=1){  //無効な入力の場合再入力を求める
 			if(turn%2==1){

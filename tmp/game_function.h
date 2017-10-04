@@ -48,13 +48,23 @@ int can_win(int X){		//ボードを参照しXに置いて勝てる場合1を、�
 
 }
 void printhint(){
-
+	int counter=0;
 
 	for(int i=0;i<12;i++){
 		if(can_win(i)==1){
+			if(i==10){
+				printf("Aに置けば勝てます\n");
+			}
+			if(i==11){
+				printf("Aに置けば勝てます\n");
+			}
 			printf("%dに置けば勝てます\n",i);
+			counter++;
 
 		}
+	}
+	if(counter==0){
+		printf("勝利手はありません\n");
 	}
 
 
@@ -63,10 +73,10 @@ void printhint(){
 
 
 int victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら1を返す　
-		int i,j;
-		for(i=0;i<12;i++){
-			for(j=0;j<12;j++){
-				if(board[i][j]!=0){
+	int i,j;
+	for(i=0;i<12;i++){
+		for(j=0;j<12;j++){
+			if(board[i][j]!=0){
 					if(abs(board[i][j]+board[i+1][j]+board[i+2][j]+board[i+3][j])==4){  //縦4つ勝利判定
 						return 1;
 					}
@@ -86,23 +96,23 @@ int victory_decision(){   //boardを読んで勝ちを判定する　勝ちな�
 			}
 		}
 		return 0;
-}
+	}
 int tmp_victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら1を返す　
-		int i,j;
-		for(i=0;i<12;i++){
-			for(j=0;j<12;j++){
-				if(tmpboard[i][j]!=0){
+	int i,j;
+	for(i=0;i<12;i++){
+		for(j=0;j<12;j++){
+			if(tmpboard[i][j]!=0){
 					if(abs(tmpboard[i][j]+tmpboard[i+1][j]+tmpboard[i+2][j]+tmpboard[i+3][j])==4){  //縦4つ勝利判定
 						return 1;
 					}
-					if(abs(tmpboard[i][j]+tmpboard[i][j+1]+tmpboard[i][j+2]+tmpboard[i][j+3])==4)  //横四つ判定
+					else if(abs(tmpboard[i][j]+tmpboard[i][j+1]+tmpboard[i][j+2]+tmpboard[i][j+3])==4)  //横四つ判定
 					{
 						return 1;
 					}
-					if(abs(tmpboard[i][j]+tmpboard[i+1][j+1]+tmpboard[i+2][j+2]+tmpboard[i+3][j+3])==4){ //右斜め判定
+					else if(abs(tmpboard[i][j]+tmpboard[i+1][j+1]+tmpboard[i+2][j+2]+tmpboard[i+3][j+3])==4){ //右斜め判定
 						return 1;
 					}
-					if(abs(tmpboard[i][j]+tmpboard[i-1][j-1]+tmpboard[i-2][j-2]+tmpboard[i-3][j-3])==4){ //左斜め判定
+					else if(abs(tmpboard[i][j]+tmpboard[i-1][j+1]+tmpboard[i-2][j+2]+tmpboard[i-3][j+3])==4){ //左斜め判定
 						return 1;
 					}
 
@@ -111,9 +121,9 @@ int tmp_victory_decision(){   //boardを読んで勝ちを判定する　勝ち�
 			}
 		}
 		return 0;
-}
+	}
 
-int game_end_message(int turn){
+	int game_end_message(int turn){
 		if (victory_decision()==1){
 			if (turn%2==1)
 			{
@@ -125,8 +135,8 @@ int game_end_message(int turn){
 		}
 		return 0;
 
-}
-void pieceputtoboard(int X,int turn){
+	}
+	void pieceputtoboard(int X,int turn){
 
 
 		for (int i = 11; i >=0; --i)
@@ -143,8 +153,8 @@ void pieceputtoboard(int X,int turn){
 				break;
 			}
 		}
-}
-void tmp_pieceputtoboard(int X,int turn){
+	}
+	void tmp_pieceputtoboard(int X,int turn){
 
 
 		for (int i = 11; i >=0; --i)
@@ -161,7 +171,7 @@ void tmp_pieceputtoboard(int X,int turn){
 				break;
 			}
 		}
-}
+	}
 
 
 int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を、適正な場合1を返す
