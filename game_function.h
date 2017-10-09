@@ -169,7 +169,7 @@ int victory_decision(){   //boardを読んで勝ちを判定する　勝ちな�
 					if(abs(board[i][j]+board[i+1][j+1]+board[i+2][j+2]+board[i+3][j+3])==4){ //右斜め判定
 						return 1;
 					}
-					if(abs(board[i][j]+board[i-1][j-1]+board[i-2][j-2]+board[i-3][j-3])==4){ //左斜め判定
+					if(abs(board[i][j]+board[i-1][j+1]+board[i-2][j+2]+board[i-3][j+3])==4){ //左斜め判定
 						return 1;
 					}
 

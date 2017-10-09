@@ -31,7 +31,7 @@ int main(int argc,char *argv[]){
 			pieceputtoboard(X, turn);
 		}
 	}
-
+ 
 
    
 	printf("ゲーム開始処理おわり\n");		/*ゲーム開始処理おわり*/
