@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include<stdio.h>
+#include<math.h>
 #include <string.h>
 extern int board[12][12];  //ボード生成
 extern int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
@@ -28,6 +29,8 @@ int iputprocess(int X,char *input);
 int com_plays();					//0~11までのコンピューターの手を返す
 int tmp_victory_decision();
 
+double nrand();
+
 void board_copy(){
 	int i,j;
 	for(i=0;i<12;i++){
@@ -40,16 +43,18 @@ void board_copy(){
 
 }
 int com_plays(){	
-	int X;	
-	X=rand()%12;
+	int X=-1;	
+
+	X=(int)round(nrand()*3+6.0);
+
 	for(int i=0;i<12;i++){
 		if(can_win(i)==1){
-			return X;
+			return i;
 		}
 	}
 	for(int i=0;i<12;i++){
 		if(will_lose(i)==1){
-			return X;
+			return i;
 		}
 	}
 
@@ -366,4 +371,24 @@ void tmp_boardclear(){
 			tmpboard[i][j]=0;
 		}
 	}
+}
+double nrand()
+{
+        static int sw=0;
+        static double r1,r2,s;
+
+        if (sw==0){
+                sw=1;
+                do {
+                        r1=2.0*drand48()-1.0;
+                        r2=2.0*drand48()-1.0;
+                        s=r1*r1+r2*r2;
+                } while (s>1.0 || s==0.0);
+                        s=sqrt(-2.0*log(s)/s);
+                        return(r1*s);
+        }
+        else {
+                sw=0;
+                return(r2*s);
+        }
 }

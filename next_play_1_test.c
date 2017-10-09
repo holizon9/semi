@@ -39,6 +39,10 @@ int main(int argc,char *argv[]){
 		}
 	}   
 	printf("ゲーム開始処理おわり\n");	
+
+	for(int f=1;f<100;f++){
+	printf("%d",com_plays());
+	}
 }	/*ゲーム開始処理おわり*/
 
 	while(turn<MAX+1){  //ゲーム
