@@ -1,3 +1,6 @@
+//#define MODE 1		//正規分布を使ったランダムアルゴ
+#define MODE 2	//評価AI
+//#define MODE 3	//上下左右3マスをみるあるご
 
 #include <stdlib.h>
 #include<stdio.h>
@@ -5,11 +8,15 @@
 #include <string.h>
 #include <time.h>
 
+
 extern int board[12][12];  //ボード生成
 extern int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
 extern int turn;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
 extern int MAX;			//最大手数
 extern int X,Y;			//ボード上の座標を示す
+		int Eval[12];
+		int Eval_MAX;
+
 void boardclear();  //ボードをクリア
 void tmp_boardclear();  //ボードをクリア
 void printboard();  //標準出力にゲームボードを表示
@@ -30,10 +37,74 @@ int will_lose(int X);
 int iputprocess(int X,char *input);
 int com_plays();					//0~11までのコンピューターの手を返す
 int tmp_victory_decision();
-//double nrand();
+int board_eval(int X);
+
+int board_eval(int X){		//tmpboardに石を追加しその盤面の評価を返す	
+	int E=0;
+
+
+///////////////////////////有利な評価
+	E=E+will_lose(X)*50000;
 
 
 
+//////////////////////////不利な評価
+	return E;
+}
+
+
+
+
+int com_plays(){
+	Eval_MAX=-999999;
+	int X=0,m;
+	if(MODE==1){							//1.正規分布		
+		for(int i=0;i<12;i++){
+			if(rand()<(RAND_MAX/2)){		
+				X++;
+			}
+		}
+
+		for(int i=0;i<12;i++){
+			if(can_win(i)==1){
+				return i;
+			}
+		}
+		for(int i=0;i<12;i++){
+			if(will_lose(i)==1){
+				return i;
+			}
+		}
+		return X;
+
+
+	}else if(MODE==2){						//2.評価AI
+		int temp;
+		for(int i=0;i<12;i++){
+			Eval[i]=0;
+			temp=0;
+			for(int j=0;j<18;j++){
+			if(rand()<(RAND_MAX/2)){		
+				temp++;
+			}
+			Eval[temp]++;
+		}
+			Eval[i]+=board_eval(i);
+			printf("%dへの評価は%dです\n",i,Eval[i]);
+			if(Eval_MAX<Eval[i]){
+				Eval_MAX=Eval[i];
+				m=i;
+			}
+		}
+		return m;
+
+
+
+
+	}else if(MODE==3){
+		return -1;
+	}
+}
 
 
 void board_copy(){
@@ -47,30 +118,6 @@ void board_copy(){
 
 
 }
-int com_plays(){	
-	int X=0;	
-
-	for(int i=0;i<12;i++){
-		if(rand()<(RAND_MAX/2)){
-			X++;
-		}
-	}
-
-	for(int i=0;i<12;i++){
-		if(can_win(i)==1){
-			return i;
-		}
-	}
-	for(int i=0;i<12;i++){
-		if(will_lose(i)==1){
-			return i;
-		}
-	}
-
-	return X;
-}
-
-
 
 int first_turn_player_decision(){
 	char input[128];
@@ -113,7 +160,7 @@ int iputprocess(int X,char *input){		//入力処理を統括
 
 
 
-int can_win(int X){		//ボードを参照しXに置いて勝てる場合1を、勝てない場合0を返す.
+int can_win(int X){		//ボードを参照しXに置いて勝てない場合0を,勝てる場合勝ち手の数を返す.
 	board_copy();
 	tmp_pieceputtoboard(X,turn);
 	return tmp_victory_decision();
@@ -194,29 +241,29 @@ int victory_decision(){   //boardを読んで勝ちを判定する　勝ちな�
 		return 0;
 	}
 int tmp_victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら1を返す　
-	int i,j;
+	int i,j,k=0;
 	for(i=0;i<12;i++){
 		for(j=0;j<12;j++){
 			if(tmpboard[i][j]!=0){
 					if(abs(tmpboard[i][j]+tmpboard[i+1][j]+tmpboard[i+2][j]+tmpboard[i+3][j])==4){  //縦4つ勝利判定
-						return 1;
+						k++;
 					}
 					else if(abs(tmpboard[i][j]+tmpboard[i][j+1]+tmpboard[i][j+2]+tmpboard[i][j+3])==4)  //横四つ判定
 					{
-						return 1;
+						k++;
 					}
 					else if(abs(tmpboard[i][j]+tmpboard[i+1][j+1]+tmpboard[i+2][j+2]+tmpboard[i+3][j+3])==4){ //右斜め判定
-						return 1;
+						k++;
 					}
 					else if(abs(tmpboard[i][j]+tmpboard[i-1][j+1]+tmpboard[i-2][j+2]+tmpboard[i-3][j+3])==4){ //左斜め判定
-						return 1;
+						k++;
 					}
 
 				}
 
 			}
 		}
-		return 0;
+		return k;
 	}
 
 	int game_end_message(int turn){
@@ -381,24 +428,25 @@ void tmp_boardclear(){
 		}
 	}
 }
-// double nrand()
-// {
 
-//         static int sw=0;
-//         static double r1,r2,s;
 
-//         if (sw==0){
-//                 sw=1;
-//                 do {
-//                         r1=2.0*drand48()-1.0;
-//                         r2=2.0*drand48()-1.0;
-//                         s=r1*r1+r2*r2;
-//                 } while (s>1.0 || s==0.0);
-//                         s=sqrt(-2.0*log(s)/s);
-//                         return(r1*s);
-//         }
-//         else {
-//                 sw=0;
-//                 return(r2*s);
-//         }
-// }
+
+/////////////////////////////AI用関数群
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

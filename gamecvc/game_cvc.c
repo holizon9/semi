@@ -1,3 +1,7 @@
+//#define GAMEMODE 1  //pvp
+#define GAMEMODE 2 //pvc
+//#define GAMEMODE 3 //cvc
+
 #include <stdlib.h>
 #include<stdio.h>
 #include <string.h>
@@ -100,12 +104,17 @@ int main(int argc,char *argv[]){
 
 
 /////////////////////////////////////////////////入力処理開始
+			if(GAMEMODE==2){
+		X=iputprocess(X, input);
+
+			}else{
+
 			X=com_plays();
 
 
 
 			printf("computer A plays%d\n",X);
-
+}
 
 		}
 /////////////////////////////////////////////////入力処理おわり
