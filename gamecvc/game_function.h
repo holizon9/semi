@@ -1,5 +1,5 @@
-//#define MODE 1		//正規分布を使ったランダムアルゴ
-#define MODE 2	//評価AI
+#define MODE 1		//正規分布を使ったランダムアルゴ
+//#define MODE 2	//評価AI
 //#define MODE 3	//上下左右3マスをみるあるご
 
 #include <stdlib.h>
@@ -59,11 +59,7 @@ int com_plays(){
 	Eval_MAX=-999999;
 	int X=0,m;
 	if(MODE==1){							//1.正規分布		
-		for(int i=0;i<12;i++){
-			if(rand()<(RAND_MAX/2)){		
-				X++;
-			}
-		}
+
 
 		for(int i=0;i<12;i++){
 			if(can_win(i)==1){
@@ -75,6 +71,12 @@ int com_plays(){
 				return i;
 			}
 		}
+		for(int i=0;i<12;i++){
+			if(rand()<(RAND_MAX/2)){		
+				X++;
+			}
+		}
+
 		return X;
 
 
@@ -326,8 +328,17 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 		printhint();
 		return 2;
 
-	}else if(!strcmp(input,"A")||!strcmp(input,"B")||(strcmp(input,"/")>0&&strcmp(input,":")<0))
-	{
+	}else if(!strcmp(input, "debug")){
+		printf("debug mode\n");
+		for(int i=0;i<12;i++){
+			for(int j=0;j<12;j++){
+				printf("%d 	",board[i][j]);
+			}
+			printf("\n");
+		}
+
+
+	}else if(!strcmp(input,"A")||!strcmp(input,"B")||(strcmp(input,"/")>0&&strcmp(input,":")<0)){
 		if((board[0][X]==0)&&(X<12)){
 			return 1;
 		}else{
@@ -338,6 +349,7 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 		printf("invalid input\n");
 		return -1;
 	}
+	return -1;
 
 }
 

@@ -57,8 +57,8 @@ int main(int argc,char *argv[]){
 		if(!strcmp(argv[1],"new")){		//棋譜ファイルを新規作成
 			time(&timer);
 			t_st=localtime(&timer);
-			sprintf(filename,"./kihu/kihu_%d_%d%d_%d.%d.%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
-			//sprintf(filename,"./kihu/kihu_a");
+			//sprintf(filename,"./kihu/kihu_%d_%d%d_%d.%d.%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
+			sprintf(filename,"./kihu/debug.log");
 			if ((fp = fopen(filename, "w+")) == NULL) {		//ファイル作成
 				printf("file open error!! A\n");
 				fo=-1; 
@@ -85,63 +85,16 @@ int main(int argc,char *argv[]){
 
 	printf("ゲーム開始処理おわり\n");	
 }	/*ゲーム開始処理おわり*/
-
-	while(turn<MAX+1){  //ゲーム
-		X=turnstart(turn);
-		if(turn%2==1){
-			printf("X? ");
-		}else{
-			printf("O? ");	
-
-		}
-
-/////////////////////////////////////////////////com思考処理
-
-		if(turn%2==com_plays_first){
-
-			X=com_plays();
+int i=0;
+while(i<10000){
+	i++;
+	fprintf(fp, "  %d\n",com_plays());		//ターン中の棋譜入力
 
 
-
-			printf("computer B plays%d\n",X);
-
-
-
-
-		} else{
-
-/////////////////////////////////////////////////com思考処理終わり
-
-
-/////////////////////////////////////////////////入力処理開始
-			if(GAMEMODE==2){	
-		X=iputprocess(X, input);
-
-			}else{
-
-			X=com_plays();
-
-
-
-			printf("computer A plays%d\n",X);
 }
 
-		}
-/////////////////////////////////////////////////入力処理おわり
-
-		pieceputtoboard(X,turn);
-		if(fo==1){
-			fprintf(fp, "%d  %d\n",turn,X);		//ターン中の棋譜入力
-
-		}
-		if(game_end_message(turn)==1){
-			break; 
-		}
 
 
-		turn++;
-
-	}
 	/////////////////////////////////////////////////ゲーム終了処理
 
 	printboard();
