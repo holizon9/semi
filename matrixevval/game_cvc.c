@@ -76,6 +76,7 @@ int main(int argc,char *argv[]){
 			while(fscanf(fp, "%d%d",&turn,&X)!=EOF){
 				pieceputtoboard(X, turn);
 			}
+			turn++;
 		}
 	}  else{ 							//棋譜ファイルを使わない
 

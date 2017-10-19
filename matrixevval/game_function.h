@@ -6,7 +6,7 @@
 /////////////////
 
 /////////////////	αβ探索深度の設定
-#define DEPTH 4
+#define DEPTH 1
 /////////////////
 
 
@@ -71,7 +71,7 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 
 	}else if(!strcmp(input, "debug")){
 		printf("debug mode\n");
-		printf("%d",com_plays());
+		printf("next_play suggests %d\n",com_plays());
 
 
 
@@ -202,14 +202,14 @@ int com_plays(){
 		mm_board_copy();
 		for(int i=0;i<12;i++){
 			if(mm_pieceputtoboard(i, turn)==0){
-
+				mm_printboard();
 				if(depth==DEPTH){
 					tmp=mm_eval(depth);
 				}else{
 					tmp=MM_min(depth+1);
 				}
 
-
+				printf("evaluation value is %d\n",tmp);
 				if(max<tmp){max=tmp;
 					choice=i;
 				}
@@ -243,7 +243,7 @@ int MM_max(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 	return 0;
 }
 int MM_min(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価、depth<DEPTHならさらに探索
-	int tmp;
+	int tmp,min;
 	for(int i=0;i<12;i++){
 		if(mm_pieceputtoboard(i, turn+depth-1)==0){
 
@@ -252,10 +252,13 @@ int MM_min(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 			}else{
 				tmp=MM_max(depth+1);
 			}
+		if(min>tmp){
+			min=tmp;
+		}
 		mm_undo(i);
 		}
 	}
-	return 0;
+	return min;
 }
 
 
@@ -279,29 +282,44 @@ printf("\n");
 printf("0 1 2 3 4 5 6 7 8 9 A B\n");
 }
 int mm_victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら+を返す　
-	int i,j,k=0;
+	int i,j,x=0,o=0;
 	for(i=0;i<12;i++){
 		for(j=0;j<12;j++){
-			if(mmboard[i][j]!=0){
+			if(mmboard[i][j]==1){
 					if(abs(mmboard[i][j]+mmboard[i+1][j]+mmboard[i+2][j]+mmboard[i+3][j])==4){  //縦4つ勝利判定
-						k++;
+						x++;
 					}
 					else if(abs(mmboard[i][j]+mmboard[i][j+1]+mmboard[i][j+2]+mmboard[i][j+3])==4)  //横四つ判定
 					{
-						k++;
+						x++;
 					}
 					else if(abs(mmboard[i][j]+mmboard[i+1][j+1]+mmboard[i+2][j+2]+mmboard[i+3][j+3])==4){ //右斜め判定
-						k++;	
+						x++;	
 					}
 					else if(abs(mmboard[i][j]+mmboard[i-1][j+1]+mmboard[i-2][j+2]+mmboard[i-3][j+3])==4){ //左斜め判定
-						k++;
+						x++;
 					}
 
+				}else if(mmboard[i][j]==-1){
+					if(abs(mmboard[i][j]+mmboard[i+1][j]+mmboard[i+2][j]+mmboard[i+3][j])==4){  //縦4つ勝利判定
+						o--;
+					}
+					else if(abs(mmboard[i][j]+mmboard[i][j+1]+mmboard[i][j+2]+mmboard[i][j+3])==4)  //横四つ判定
+					{
+						o--;
+					}
+					else if(abs(mmboard[i][j]+mmboard[i+1][j+1]+mmboard[i+2][j+2]+mmboard[i+3][j+3])==4){ //右斜め判定
+						o--;	
+					}
+					else if(abs(mmboard[i][j]+mmboard[i-1][j+1]+mmboard[i-2][j+2]+mmboard[i-3][j+3])==4){ //左斜め判定
+						o--;
+					}					
 				}
 
 			}
 		}
-		return k;
+		return x
+		;
 	}
 
 	void mm_undo(int X){
@@ -348,10 +366,11 @@ int mm_victory_decision(){   //boardを読んで勝ちを判定する　勝ち�
 	}
 
 int mm_eval(int depth){
-	if(depth%2==1){
-
+	int eval=0;
+	if(mm_victory_decision()!=0){
+		eval=100;
 	}
-return 0;
+return eval;
 }
 
 
