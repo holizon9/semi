@@ -6,7 +6,7 @@
 /////////////////
 
 /////////////////	αβ探索深度の設定
-#define DEPTH 1
+#define DEPTH 3
 /////////////////
 
 
@@ -173,24 +173,24 @@ int com_plays(){
 			temp=0;
 			for(int j=0;j<12;j++){
 				if(rand()<(RAND_MAX/2)){		
-				temp++;
+					temp++;
+				}
+				Eval[temp]++;
 			}
-			Eval[temp]++;
+			Eval[i]+=board_eval(i);
+			printf("%dへの評価は%dです\n",i,Eval[i]);
+			if(Eval_MAX<Eval[i]){
+				Eval_MAX=Eval[i];
+				m=i;
+			}
 		}
-		Eval[i]+=board_eval(i);
-		printf("%dへの評価は%dです\n",i,Eval[i]);
-		if(Eval_MAX<Eval[i]){
-			Eval_MAX=Eval[i];
-			m=i;
-		}
-	}
-	return m;
+		return m;
 
 
 
 
-}else if(MODE==3){
-	return MatrixEvaluation();
+	}else if(MODE==3){
+		return MatrixEvaluation();
 
 	}else if(MODE==4){		//alpha-beta	
 		/*
@@ -202,18 +202,19 @@ int com_plays(){
 		mm_board_copy();
 		for(int i=0;i<12;i++){
 			if(mm_pieceputtoboard(i, turn)==0){
-				mm_printboard();
+
 				if(depth==DEPTH){
 					tmp=mm_eval(depth);
 				}else{
 					tmp=MM_min(depth+1);
 				}
-
-				printf("evaluation value is %d\n",tmp);
 				if(max<tmp){max=tmp;
 					choice=i;
 				}
 
+				 mm_printboard();
+				 printf("about prime,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
+				 printf("evaluation value is %d\n\n",tmp);
 
 
 
@@ -222,13 +223,13 @@ int com_plays(){
 				mm_undo(i);
 			}
 		}
-	return choice;
+		return choice;
 	}
 
 }
 ///////////////////////////////////////////minimax関数群
 int MM_max(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価、depth<DEPTHならさらに探索
-	int tmp;
+	int tmp=0,max=-9999;
 	for(int i=0;i<12;i++){
 		if(mm_pieceputtoboard(i, turn+depth-1)==0){
 
@@ -237,13 +238,18 @@ int MM_max(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 			}else{
 				tmp=MM_min(depth);
 			}
-		mm_undo(i);
+			if(max<tmp){max=tmp;
+			}
+			mm_printboard();
+			printf("about mmmax,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
+			printf("evaluation value is %d\n\n",tmp);
+			mm_undo(i);
 		}
 	}
-	return 0;
+	return max;
 }
 int MM_min(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価、depth<DEPTHならさらに探索
-	int tmp,min;
+	int tmp=0,min=9999;
 	for(int i=0;i<12;i++){
 		if(mm_pieceputtoboard(i, turn+depth-1)==0){
 
@@ -252,10 +258,13 @@ int MM_min(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 			}else{
 				tmp=MM_max(depth+1);
 			}
-		if(min>tmp){
-			min=tmp;
-		}
-		mm_undo(i);
+			if(min>tmp){
+				min=tmp;
+			}
+			mm_printboard();
+			printf("about mmmin,vicdec is %d,min is %d ,tmp is%d\n",mm_victory_decision(),min,tmp);
+			printf("evaluation value is %d\n\n",tmp);
+			mm_undo(i);
 		}
 	}
 	return min;
@@ -269,110 +278,97 @@ void mm_printboard(){
 		{
 			if(mmboard[i][j]==0){
 				printf(". ");
+			}
+			if(mmboard[i][j]==1){
+				printf("X ");
+			}
+			if(mmboard[i][j]==-1){
+				printf("O ");
+			}
 		}
-		if(mmboard[i][j]==1){
-			printf("X ");
+		printf("\n");
 	}
-	if(mmboard[i][j]==-1){
-		printf("O ");
+	printf("0 1 2 3 4 5 6 7 8 9 A B\n");
 }
+
+
+void mm_undo(int X){
+	for(int i=0;i<12;i++){
+		if(mmboard[i][X]!=0){
+
+			mmboard[i][X]=0;
+			break;
+		}
+	}
 }
-printf("\n");
+int mm_pieceputtoboard(int X,int turns){
+	if(mmboard[0][X]!=0){
+		return -1;
+	}
+
+	for (int i = 11; i >=0; --i)
+	{
+
+		if (mmboard[i][X]==0)
+		{
+			if (turns%2==0)
+			{
+				mmboard[i][X]=-1;
+			}else{
+				mmboard[i][X]=1;
+			}
+			break;
+		}
+	}
+	return 0;
 }
-printf("0 1 2 3 4 5 6 7 8 9 A B\n");
-}
-int mm_victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら+を返す　
-	int i,j,x=0,o=0;
+
+void mm_board_copy(){
+	int i,j;
 	for(i=0;i<12;i++){
 		for(j=0;j<12;j++){
-			if(mmboard[i][j]==1){
-					if(abs(mmboard[i][j]+mmboard[i+1][j]+mmboard[i+2][j]+mmboard[i+3][j])==4){  //縦4つ勝利判定
-						x++;
-					}
-					else if(abs(mmboard[i][j]+mmboard[i][j+1]+mmboard[i][j+2]+mmboard[i][j+3])==4)  //横四つ判定
-					{
-						x++;
-					}
-					else if(abs(mmboard[i][j]+mmboard[i+1][j+1]+mmboard[i+2][j+2]+mmboard[i+3][j+3])==4){ //右斜め判定
-						x++;	
-					}
-					else if(abs(mmboard[i][j]+mmboard[i-1][j+1]+mmboard[i-2][j+2]+mmboard[i-3][j+3])==4){ //左斜め判定
-						x++;
-					}
-
-				}else if(mmboard[i][j]==-1){
-					if(abs(mmboard[i][j]+mmboard[i+1][j]+mmboard[i+2][j]+mmboard[i+3][j])==4){  //縦4つ勝利判定
-						o--;
-					}
-					else if(abs(mmboard[i][j]+mmboard[i][j+1]+mmboard[i][j+2]+mmboard[i][j+3])==4)  //横四つ判定
-					{
-						o--;
-					}
-					else if(abs(mmboard[i][j]+mmboard[i+1][j+1]+mmboard[i+2][j+2]+mmboard[i+3][j+3])==4){ //右斜め判定
-						o--;	
-					}
-					else if(abs(mmboard[i][j]+mmboard[i-1][j+1]+mmboard[i-2][j+2]+mmboard[i-3][j+3])==4){ //左斜め判定
-						o--;
-					}					
-				}
-
-			}
-		}
-		return x
-		;
-	}
-
-	void mm_undo(int X){
-		for(int i=0;i<12;i++){
-			if(mmboard[i][X]!=0){
-
-				mmboard[i][X]=0;
-				break;
-			}
+			mmboard[i][j]=board[i][j];
 		}
 	}
-	int mm_pieceputtoboard(int X,int turns){
-		if(mmboard[0][X]!=0){
-			return -1;
-		}
 
-		for (int i = 11; i >=0; --i)
-		{
-
-			if (mmboard[i][X]==0)
-			{
-				if (turns%2==0)
-				{
-					mmboard[i][X]=-1;
-				}else{
-					mmboard[i][X]=1;
-				}
-				break;
-			}
-		}
-		return 0;
-	}
-
-	void mm_board_copy(){
-		int i,j;
-		for(i=0;i<12;i++){
-			for(j=0;j<12;j++){
-				mmboard[i][j]=board[i][j];
-			}
-		}
-
-
-
-	}
+}
 
 int mm_eval(int depth){
 	int eval=0;
-	if(mm_victory_decision()!=0){
-		eval=100;
+	eval = mm_victory_decision()*100;
+	if(turn%2==0){eval=-eval;
 	}
-return eval;
+	return eval;
 }
+int mm_victory_decision(){   //boardを読んで勝ちを判定する  先手勝ちなら1 後手かちなら-1を返す
+	int i,j;
+	for(i=0;i<12;i++){
+		for(j=0;j<12;j++){
+			if(mmboard[i][j]!=0){
+					if(abs(mmboard[i][j]+mmboard[i+1][j]+mmboard[i+2][j]+mmboard[i+3][j])==4){  //縦4つ勝利判定
+						return mmboard[i][j];
+					}
+					else if(abs(mmboard[i][j]+mmboard[i][j+1]+mmboard[i][j+2]+mmboard[i][j+3])==4)  //横四つ判定
+					{
+						return mmboard[i][j];
 
+					}
+					else if(abs(mmboard[i][j]+mmboard[i+1][j+1]+mmboard[i+2][j+2]+mmboard[i+3][j+3])==4){ //右斜め判定
+						return mmboard[i][j];
+
+					}
+					else if(abs(mmboard[i][j]+mmboard[i-1][j+1]+mmboard[i-2][j+2]+mmboard[i-3][j+3])==4){ //左斜め判定
+						return mmboard[i][j];
+
+					}
+
+				}
+
+			}
+		}
+		return 0;
+		
+	}
 
 
 ///////////////////////////////////////////
@@ -392,23 +388,23 @@ return eval;
 	int first_turn_player_decision(){
 		char input[128];
 
-printf("プレイヤーが先手を持ちますか？y/n\n");
+		printf("プレイヤーが先手を持ちますか？y/n\n");
 
-while(1){
-	scanf("%s",input);
-	if(!strcmp(input, "y")){
-		return 0;
-		break;
+		while(1){
+			scanf("%s",input);
+			if(!strcmp(input, "y")){
+				return 0;
+				break;
+			}
+			if(!strcmp(input, "n")){
+				return 1;
+				break;
+			}
+		}
+
+
+
 	}
-	if(!strcmp(input, "n")){
-		return 1;
-		break;
-	}
-}
-
-
-
-}
 
 
 int iputprocess(int X,char *input){		//入力処理を統括
@@ -453,36 +449,36 @@ void printhint(){
 		if(can_win(i)==1){
 			if(i==10){
 				printf("Aに置けば勝てます\n");
+			}
+			if(i==11){
+				printf("Bに置けば勝てます\n");
+			}
+			printf("%dに置けば勝てます\n",i);
+			counter++;
+
 		}
-		if(i==11){
-			printf("Bに置けば勝てます\n");
 	}
-	printf("%dに置けば勝てます\n",i);
-	counter++;
-
-}
-}
-if(counter==0){
-	printf("勝利手はありません\n");
-}
-counter=0;
-
-for(int i=0;i<12;i++){
-	if(will_lose(i)==1){
-		if(i==10){
-			printf("Aに置かれると負けます\n");
+	if(counter==0){
+		printf("勝利手はありません\n");
 	}
-	if(i==11){
-		printf("Bに置かれると負けます\n");
-}
-printf("%dに置かれると負けます\n",i);
-counter++;
+	counter=0;
 
-}
-}
-if(counter==0){
-	printf("敗北手はありません\n");
-}
+	for(int i=0;i<12;i++){
+		if(will_lose(i)==1){
+			if(i==10){
+				printf("Aに置かれると負けます\n");
+			}
+			if(i==11){
+				printf("Bに置かれると負けます\n");
+			}
+			printf("%dに置かれると負けます\n",i);
+			counter++;
+
+		}
+	}
+	if(counter==0){
+		printf("敗北手はありません\n");
+	}
 
 } 
 
@@ -614,17 +610,17 @@ void printboard(){
 		{
 			if(board[i][j]==0){
 				printf(". ");
+			}
+			if(board[i][j]==1){
+				printf("X ");
+			}
+			if(board[i][j]==-1){
+				printf("O ");
+			}
 		}
-		if(board[i][j]==1){
-			printf("X ");
+		printf("\n");
 	}
-	if(board[i][j]==-1){
-		printf("O ");
-}
-}
-printf("\n");
-}
-printf("0 1 2 3 4 5 6 7 8 9 A B\n");
+	printf("0 1 2 3 4 5 6 7 8 9 A B\n");
 }
 void tmp_printboard(){
 	for (int i = 0; i < 12; ++i)
@@ -633,17 +629,17 @@ void tmp_printboard(){
 		{
 			if(tmpboard[i][j]==0){
 				printf(". ");
+			}
+			if(tmpboard[i][j]==1){
+				printf("X ");
+			}
+			if(tmpboard[i][j]==-1){
+				printf("O ");
+			}
 		}
-		if(tmpboard[i][j]==1){
-			printf("X ");
+		printf("\n");
 	}
-	if(tmpboard[i][j]==-1){
-		printf("O ");
-}
-}
-printf("\n");
-}
-printf("0 1 2 3 4 5 6 7 8 9 A B\n");
+	printf("0 1 2 3 4 5 6 7 8 9 A B\n");
 }
 void boardclear(){
 	for (int i = 0; i < 12; ++i)
