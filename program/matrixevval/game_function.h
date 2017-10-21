@@ -6,7 +6,7 @@
 /////////////////
 
 /////////////////	αβ探索深度の設定
-#define DEPTH 3
+#define DEPTH 1
 /////////////////
 
 
@@ -33,6 +33,7 @@ void tmp_printboard();
 void tmp_undo(int X);
 
 void printboard();  //標準出力にゲームボードを表示
+void printboard_color(int X);
 void pieceputtoboard(int X,int turn);	//ボードに駒を配置
 int inputerrorcheck(char *input,int X);
 int turnstart(int turn);	//ターン開始時の処理をまとめたもの
@@ -581,7 +582,6 @@ int tmp_victory_decision(){   //boardを読んで勝ちを判定する　勝ち�
 		}else{
 			printf("先手番\n");
 		}
-		printboard();
 	X=-1; //エラー検出のため
 	return X;
 
@@ -616,6 +616,50 @@ void printboard(){
 			}
 			if(board[i][j]==-1){
 				printf("O ");
+			}
+		}
+		printf("\n");
+	}
+	printf("0 1 2 3 4 5 6 7 8 9 A B\n");
+}
+void printboard_color(int X){
+	int y;
+	for(int i=0	;i<12;i++){
+		if(board[i][X]!=0){
+			y=i;
+
+			break;
+		}
+	}
+	for (int i = 0; i < 12; ++i)
+	{
+		for (int j = 0; j< 12; ++j)
+		{
+			if(board[i][j]==0){
+				printf(". ");
+			}
+			if(board[i][j]==1){
+				if(i==y&&j==X){
+					printf("\033[45m");
+					printf("X ");
+					printf("\033[0m");
+
+				}else{
+
+				printf("X ");
+				}
+
+			}
+			if(board[i][j]==-1){
+				if(i==y&&j==X){
+					printf("\033[45m");
+					printf("O ");
+					printf("\033[0m");
+
+				}else{
+
+				printf("O ");
+				}
 			}
 		}
 		printf("\n");

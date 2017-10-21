@@ -25,12 +25,11 @@ int main(int argc,char *argv[]){
 	struct tm *t_st;
 
 	int fo=0;
-	int com_plays_first=0;	//com先手なら1,違うなら0
     srand((unsigned)time(NULL));
 
 	/*ゲーム開始処理*/{
 	//この処理は開発時に不要なためコメントアウト
-	if (0){
+	if (1){
 		printf("最大ターンを入力してください\n");
 		scanf("%d",&MAX);
 	}
@@ -39,16 +38,7 @@ int main(int argc,char *argv[]){
 	//この処理は先手後手を決めるための処理
 	
 	//com_plays_first=first_turn_player_decision();
-	com_plays_first=rand()%2;
 
-	if(com_plays_first%2==0){
-		printf("プレイヤーが先手です\n");
-
-	}else{
-		printf("コンピューターが先手です\n");
-
-
-	}
 	//この処理は先手後手を決めるための処理
 
 
@@ -86,6 +76,8 @@ int main(int argc,char *argv[]){
 
 
 	printf("ゲーム開始処理おわり\n");	
+		printboard();
+
 }	/*ゲーム開始処理おわり*/
 
 	while(turn<MAX+1){  //ゲーム
@@ -108,6 +100,7 @@ int main(int argc,char *argv[]){
 			fprintf(fp, "%d  %d\n",turn,X);		//ターン中の棋譜入力
 
 		}
+		printboard_color(X);
 		if(game_end_message(turn)==1){
 			break; 
 		}
@@ -118,7 +111,7 @@ int main(int argc,char *argv[]){
 	}
 	/////////////////////////////////////////////////ゲーム終了処理
 
-	printboard();
+	end_printboard(X,victory_decision());		///end_printboardをつくる
 	if(fo==1){
 		fclose(fp);
 	}
