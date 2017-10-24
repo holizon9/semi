@@ -1,8 +1,8 @@
 /////////////////  AI思考ロジックの選択
-//#define MODE 1		//正規分布を使ったランダムアルゴ
+#define MODE 1		//正規分布を使ったランダムアルゴ
 //#define MODE 2	//評価AI
 //#define MODE 3	//上下左右3マスをみるあるご
-#define MODE 4		//minimax
+//#define MODE 4		//minimax
 /////////////////
 
 /////////////////	αβ探索深度の設定
@@ -397,9 +397,10 @@ int mm_victory_decision(){   //boardを読んで勝ちを判定する  先手勝
 	int first_turn_player_decision(){
 		char input[128];
 
-		printf("プレイヤーが先手を持ちますか？y/n\n");
 
 		while(1){
+			printf("プレイヤーが先手を持ちますか？y/n\n");
+
 			scanf("%s",input);
 			if(!strcmp(input, "y")){
 				return 0;
@@ -630,46 +631,61 @@ void printboard(){
 	}
 	printf("0 1 2 3 4 5 6 7 8 9 A B\n");
 }
-void end_printboard(int X,int vicdec){
+
+
+void end_printboard(){
 	printf("\033[2J");
 
-	int i,j,y;
-  	for(i=0	;i<12;i++){
-		if(board[i][X]!=0){
-			y=i;
-
-			break;
-		}
+	int i,j;
+	int color[12][12];
+	for(i=0;i<12;i++){
+		for(j=0;j<12;j++){
+			color[i][j]=0;
+		}	
 	}
+	for(i=0;i<12;i++){
+		for(j=0;j<12;j++){
+			if(board[i][j]!=0){
+					if(abs(board[i][j]+board[i+1][j]+board[i+2][j]+board[i+3][j])==4){  //縦4つ勝利判定
+						color[i][j]=1;
+						color[i+1][j]=1;
+						color[i+2][j]=1;
+						color[i+3][j]=1;
+
+					}
+					if(abs(board[i][j]+board[i][j+1]+board[i][j+2]+board[i][j+3])==4)  //横四つ判定
+					{
+						color[i][j+1]=1;
+						color[i][j+2]=1;
+						color[i][j+3]=1;
+						color[i][j]=1;
+					}
+					if(abs(board[i][j]+board[i+1][j+1]+board[i+2][j+2]+board[i+3][j+3])==4){ //右斜め判定
+						color[i][j]=1;
+						color[i+1][j+1]=1;
+						color[i+2][j+2]=1;
+						color[i+3][j+3]=1;
+					}
+					if(abs(board[i][j]+board[i+1][j-1]+board[i+2][j-2]+board[i+3][j-3])==4){ //左斜め判定
+
+						color[i][j]=1;
+						color[i+1][j-1]=1;
+						color[i+2][j-2]=1;
+						color[i+3][j-3]=1;
+					}
+
+				}
+
+			}
+		}
 	for (i = 0; i < 12; ++i)
 	{
 		for (j = 0; j< 12; ++j)
 		{
-			switch(vicdec){
-				case 1:
-					if((i==y||i-1==y||i-2==y||i-3==y)&&j==X){
-						printf("\033[45m");
-					}
-					break;
-				case 2:
-					if((i==y)&&(j==X||j+1==X||j+2==X||j+3==X)){
-						printf("\033[45m");
-					}
-					break;
-
-				case 3:
-					if((i==y&&j==X)||(i+1==y&&j+1==X)||(i+2==y&&j+2==X)||(i+3==y&&j+3==X)){
-						printf("\033[45m");
-					}
-					break;
-				case 4:
-					if((i==y&&j==X)||(i-1==y&&j+1==X)||(i-2==y&&j+2==X)||(i-3==y&&j+3==X)){
-						printf("\033[45m");
-					}
-					break;
-				default:
-					break;
+			if(color[i][j]==1){
+				printf("\033[45m");
 			}
+
 			if(board[i][j]==0){
 				printf(". ");
 			}
@@ -691,6 +707,7 @@ void end_printboard(int X,int vicdec){
 
 void printboard_color(int X){
 	printf("\033[2J");
+	printf("\n");
 	int y;
 	int i,j;
 	for(i=0	;i<12;i++){
