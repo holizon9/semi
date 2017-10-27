@@ -1,5 +1,5 @@
-#define GAMEMODE 1  //pvp
-//#define GAMEMODE 2 //pvc
+//#define GAMEMODE 1  //pvp
+#define GAMEMODE 2 //pvc
 //#define GAMEMODE 3 //cvc
 
 #include <stdlib.h>
@@ -44,7 +44,8 @@ int main(int argc,char *argv[]){
 		if(!strcmp(argv[1],"new")){		//棋譜ファイルを新規作成
 			time(&timer);
 			t_st=localtime(&timer);
-			sprintf(filename,"./kihu/kihu_%d年%d月%d日%d：%d：%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
+			sprintf(filename,"./kihu/kihu_%d_%d%d_%d.%d.%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
+			//sprintf(filename,"./kihu/kihu_a");
 			if ((fp = fopen(filename, "w+")) == NULL) {		//ファイル作成
 				printf("file open error!! A\n");
 				fo=-1; 

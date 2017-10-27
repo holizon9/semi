@@ -1,6 +1,6 @@
 //#define GAMEMODE 1  //pvp
-#define GAMEMODE 2 //pvc
-//#define GAMEMODE 3 //cvc
+//#define GAMEMODE 2 //pvc
+#define GAMEMODE 3 //cvc
 
 #include <stdlib.h>
 #include<stdio.h>
@@ -13,7 +13,7 @@ int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
 int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
 int MAX=128;			//最大手数
 int X,Y;			//ボード上の座標を示す
-
+int fo=0;
 
 
 int main(int argc,char *argv[]){
@@ -26,7 +26,6 @@ int main(int argc,char *argv[]){
 	struct tm *t_st;
 	int playfirst;
 
-	int fo=0;
     srand((unsigned)time(NULL));
 
 	/*ゲーム開始処理*/{
@@ -37,13 +36,6 @@ int main(int argc,char *argv[]){
 	}
 	//この処理は開発時に不要なためコメントアウト
 
-	//この処理は先手後手を決めるための処理
-	if(GAMEMODE==2){
-		playfirst=first_turn_player_decision();
-
-	}
-
-	//この処理は先手後手を決めるための処理
 
 
 	boardclear();
@@ -52,8 +44,7 @@ int main(int argc,char *argv[]){
 		if(!strcmp(argv[1],"new")){		//棋譜ファイルを新規作成
 			time(&timer);
 			t_st=localtime(&timer);
-			sprintf(filename,"./kihu/kihu_%d_%d%d_%d.%d.%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
-			//sprintf(filename,"./kihu/kihu_a");
+			sprintf(filename,"./kihu/kihu_%d年%d月%d日%d：%d：%d.dat",t_st->tm_year+1900,t_st->tm_mon+1,t_st->tm_mday,t_st->tm_hour,t_st->tm_min,t_st->tm_sec);
 			if ((fp = fopen(filename, "w+")) == NULL) {		//ファイル作成
 				printf("file open error!! A\n");
 				fo=-1; 
@@ -77,10 +68,18 @@ int main(int argc,char *argv[]){
 		printf("棋譜ファイルを使用しません\n");
 	}
 	srand((unsigned)time(NULL));
+	printboard();
+
+	//この処理は先手後手を決めるための処理
+	if(GAMEMODE==2){
+		playfirst=first_turn_player_decision();
+
+	}
+
+	//この処理は先手後手を決めるための処理
 
 
 	printf("ゲーム開始処理おわり\n");	
-		printboard();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  基本的にいじるひつようなし
 }	/*ゲーム開始処理おわり*/
 
@@ -105,6 +104,10 @@ int main(int argc,char *argv[]){
 					X=iputprocess(X, input);
 				}else{
 					X=com_plays();
+					if(X<0||11<X){
+						printf("com retires\n");
+						break;
+					}
 				}
 				break;
 			case 3:
@@ -136,7 +139,7 @@ int main(int argc,char *argv[]){
 	}
 	/////////////////////////////////////////////////ゲーム終了処理
 
-	end_printboard(X,victory_decision());		///end_printboardをつくる
+	end_printboard();		///end_printboardをつくる
 	game_end_message(turn);
 	if(fo==1){
 		fclose(fp);

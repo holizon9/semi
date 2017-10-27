@@ -6,7 +6,7 @@
 /////////////////
 
 /////////////////	αβ探索深度の設定
-#define DEPTH 3
+#define DEPTH 1
 /////////////////
 
 
@@ -110,7 +110,18 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 
 
 
+int n_distribution(){			//正規分布
+  int i;
+	for(i=0;i<12;i++){
+		if(rand()<(RAND_MAX/2)){		
+			X++;
+		}
+	}
 
+	return X;
+
+
+}
 
 
 
@@ -192,8 +203,8 @@ int com_plays(){
 		まずは3手詰めを見つけるプログラムを目標にする
 
 		*/
-		int depth=1,max=-9998,tmp=-9999;
-		int choice=-1;
+		int depth=1,max=-9999,tmp=-9999;
+		int choice;
 		int i;
 		mm_board_copy();
 		for(i=0;i<12;i++){
@@ -218,9 +229,6 @@ int com_plays(){
 
 				mm_undo(i);
 			}
-		}
-		if(choice==0){	
-			return n_distribution();
 		}
 		return choice;
 	}
@@ -826,18 +834,7 @@ void tmp_pieceputtoboard(int X,int turns){
 	}
 }
 
-int n_distribution(){			//正規分布
-  int i,X=0;
-	for(i=0;i<12;i++){
-		if(rand()<(RAND_MAX/2)){		
-			X++;
-		}
-	}
 
-	return X;
-
-
-}
 
 /////////////////////////////AI用関数群
 

@@ -1,12 +1,13 @@
 /////////////////  AI思考ロジックの選択
-#define MODE 1		//正規分布を使ったランダムアルゴ
+//#define MODE 1		//正規分布を使ったランダムアルゴ
 //#define MODE 2	//評価AI
 //#define MODE 3	//上下左右3マスをみるあるご
-//#define MODE 4		//minimax
+#define MODE 4		//minimax
 /////////////////
 
 /////////////////	αβ探索深度の設定
-#define DEPTH 1
+#define DEPTH 5
+#define DEBUG 0	
 /////////////////
 
 
@@ -24,6 +25,7 @@ extern int tmpboard[12][12]; //関数内で使用する一時的なボードの�
 extern int turn;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
 extern int MAX;			//最大手数
 extern int X,Y;			//ボード上の座標を示す
+extern int fo;
 int mmboard[12][12];
 
 void tmp_boardclear();  //ボードをクリア
@@ -51,7 +53,7 @@ int com_plays();					//0~11までのコンピューターの手を返す
 int board_eval(int X);			//盤面評価関数
 int MatrixEvaluation();			// 行列評価関数
 int n_distribution();
-void end_printboard(int X,int vicdec);
+void end_printboard();
 
 int MM_max(int depth);
 int MM_min(int depth);
@@ -76,9 +78,15 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 		printf("debug mode\n");
 		printf("next_play suggests %d\n",com_plays());
 
+	}else if(!strcmp(input, "mate")){
 
 
+	}else if(!strcmp(input, "save")){
+		/*
 
+			あとでsaveを実装する
+
+			*/		
 	}else if(!strcmp(input, "undo")){
 		/*
 
@@ -106,20 +114,6 @@ int inputerrorcheck(char *input,int X){  //入力が適正でない場合-1を�
 
 
 
-
-
-int n_distribution(){			//正規分布
-  int i;
-	for(i=0;i<12;i++){
-		if(rand()<(RAND_MAX/2)){		
-			X++;
-		}
-	}
-
-	return X;
-
-
-}
 
 
 
@@ -201,25 +195,37 @@ int com_plays(){
 		まずは3手詰めを見つけるプログラムを目標にする
 
 		*/
-		int depth=1,max=-9999,tmp=-9999;
-		int choice;
+		int depth=1,max=-9998,tmp=-9999;
+		int choice=-1;
 		int i;
-		mm_board_copy();
+		int canditate[12],ndist;
 		for(i=0;i<12;i++){
+		canditate[i]=0;
+		}
+		mm_board_copy();
+		for(i=0;i<12;i++){		//depth is 1
 			if(mm_pieceputtoboard(i, turn)==0){
 
-				if(depth==DEPTH){
-					tmp=mm_eval(depth);
-				}else{
-					tmp=MM_min(depth+1);
+				if(mm_victory_decision()==0){
+				tmp=MM_min(depth+1);
+				if(tmp<0){
+					canditate[i]=-1;
 				}
-				if(max<tmp){max=tmp;
+				}else{
+					return i;
+				}
+				
+				if(max<tmp){
+					max=tmp;
 					choice=i;
 				}
+				if(1){
 
-				 mm_printboard();
-				 printf("about prime,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
+				mm_printboard();
+				printf("about prime,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
 				 printf("evaluation value is %d\n\n",tmp);
+				}
+
 
 
 
@@ -228,11 +234,20 @@ int com_plays(){
 				mm_undo(i);
 			}
 		}
+		if(max==0){	
+			while(1){
+				ndist=n_distribution();
+				if(canditate[ndist]!=-1){
+					return ndist;
+				}
+			}
+		}
 		return choice;
 	}
 
 }
 ///////////////////////////////////////////minimax関数群
+
 int MM_max(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価、depth<DEPTHならさらに探索
 	int tmp=0,max=-9999;
 	int i;
@@ -242,13 +257,19 @@ int MM_max(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 			if(depth==DEPTH){
 				tmp=mm_eval(depth);
 			}else{
-				tmp=MM_min(depth);
+				if(mm_victory_decision()==0){
+					tmp=MM_min(depth+1);
+				}else{
+					tmp=mm_eval(depth);	
+				}
 			}
 			if(max<tmp){max=tmp;
 			}
+			if(DEBUG==1){
 			mm_printboard();
 			printf("about mmmax,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
-			printf("evaluation value is %d\n\n",tmp);
+			printf("evaluation value is %d\n\n",tmp);			
+			}
 			mm_undo(i);
 		}
 	}
@@ -263,14 +284,21 @@ int MM_min(int depth){		//X=0~12まで置いて、depth=DEPTHなら盤面評価�
 			if(depth==DEPTH){
 				tmp=mm_eval(depth);
 			}else{
-				tmp=MM_max(depth+1);
+				if(mm_victory_decision()==0){
+					tmp=MM_max(depth+1);
+				}else{
+					tmp= mm_eval(depth);
+				}
 			}
 			if(min>tmp){
 				min=tmp;
 			}
+			if(DEBUG==1){
 			mm_printboard();
 			printf("about mmmin,vicdec is %d,min is %d ,tmp is%d\n",mm_victory_decision(),min,tmp);
 			printf("evaluation value is %d\n\n",tmp);
+			}
+
 			mm_undo(i);
 		}
 	}
@@ -349,7 +377,7 @@ int mm_eval(int depth){
 	}
 	return eval;
 }
-int mm_victory_decision(){   //boardを読んで勝ちを判定する  先手勝ちなら1 後手かちなら-1を返す
+int mm_victory_decision(int depth){   //boardを読んで勝ちを判定する  先手勝ちなら1 後手かちなら-1を返す
 	int i,j;
 	for(i=0;i<12;i++){
 		for(j=0;j<12;j++){
@@ -520,7 +548,7 @@ int victory_decision(){   //boardを読んで勝ちを判定する　勝ちな�
 		}
 		return 0;
 	}
-int tmp_victory_decision(){   //boardを読んで勝ちを判定する　勝ちなら1を返す　
+int tmp_victory_decision(){   //tmpboardを読んで勝ちを判定する　勝ちなら1を返す　
 	int i,j,k=0;
 	for(i=0;i<12;i++){
 		for(j=0;j<12;j++){
@@ -634,7 +662,7 @@ void printboard(){
 
 
 void end_printboard(){
-	printf("\033[2J");
+  //printf("\033[2J");
 
 	int i,j;
 	int color[12][12];
@@ -832,7 +860,18 @@ void tmp_pieceputtoboard(int X,int turns){
 	}
 }
 
+int n_distribution(){			//正規分布
+  int i, s=0;
+	for(i=0;i<12;i++){
+		if(rand()<(RAND_MAX/2)){		
+			s++;
+		}
+	}
 
+	return s;
+
+
+}
 
 /////////////////////////////AI用関数群
 
