@@ -190,11 +190,8 @@ int com_plays(){
 	}else if(MODE==3){
 		return MatrixEvaluation();
 
-	}else if(MODE==4){		//alpha-beta	
-		/*
-		まずは3手詰めを見つけるプログラムを目標にする
+	}else if(MODE==4){	
 
-		*/
 		int depth=1,max=-9998,tmp=-9999;
 		int choice=-1;
 		int i;
@@ -222,7 +219,7 @@ int com_plays(){
 				if(1){
 
 				mm_printboard();
-				printf("about prime,vicdec is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
+				printf(" prime,victory decision is %d,max is %d ,tmp is%d\n",mm_victory_decision(),max,tmp);
 				 printf("evaluation value is %d\n\n",tmp);
 				}
 
@@ -233,6 +230,9 @@ int com_plays(){
 
 				mm_undo(i);
 			}
+		}
+		if(max==100){
+			printf("checkmate ");
 		}
 		if(max==0){	
 			while(1){
