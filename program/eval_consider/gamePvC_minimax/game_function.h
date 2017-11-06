@@ -231,7 +231,7 @@ int com_plays(){
 				mm_undo(i);
 			}
 		}
-		if(max==100){
+		if(max>=100){
 			printf("checkmate ");
 		}
 

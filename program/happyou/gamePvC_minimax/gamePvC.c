@@ -1,6 +1,6 @@
 //#define GAMEMODE 1  //pvp
-//#define GAMEMODE 2 //pvc
-#define GAMEMODE 3 //cvc
+#define GAMEMODE 2 //pvc
+//#define GAMEMODE 3 //cvc
 
 #include <stdlib.h>
 #include<stdio.h>
@@ -11,7 +11,7 @@
 int board[12][12];  //ボード生成
 int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
 int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
-int MAX=25;			//最大手数
+int MAX=144;			//最大手数
 int X,Y;			//ボード上の座標を示す
 int fo=0;
 
@@ -27,7 +27,7 @@ int main(int argc,char *argv[]){
 	int playfirst;
 	int seed;
 	seed = (unsigned)time(NULL);
-	seed = 1509335351;
+	//seed = 1509347469;
 	srand(seed);
 
 	/*ゲーム開始処理*/{
@@ -86,6 +86,7 @@ int main(int argc,char *argv[]){
 }	/*ゲーム開始処理おわり*/
 
 	while(turn<MAX+1){  //ゲーム
+		printf("\n\n");
 		X=turnstart(turn);
 		if(turn%2==1){
 			printf("X? ");
@@ -149,7 +150,10 @@ int main(int argc,char *argv[]){
 
 	end_printboard();		///end_printboardをつくる
 	game_end_message(turn);
-	printf("seed is %d\n",seed);
+	if(GAMEMODE!=1){
+		printf("seed is %d\n",seed);
+
+	}
 	if(fo==1){
 		fclose(fp);
 	}

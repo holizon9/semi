@@ -1,6 +1,6 @@
-#define GAMEMODE 1  //pvp
+//#define GAMEMODE 1  //pvp
 //#define GAMEMODE 2 //pvc
-//#define GAMEMODE 3 //cvc
+#define GAMEMODE 3 //cvc
 
 #include <stdlib.h>
 #include<stdio.h>
@@ -11,7 +11,7 @@
 int board[12][12];  //ボード生成
 int tmpboard[12][12]; //関数内で使用する一時的なボードの砂場
 int turn=1;   	//ターンカウンタ　　奇数で先手番　偶数で後手番
-int MAX=128;			//最大手数
+int MAX=25;			//最大手数
 int X,Y;			//ボード上の座標を示す
 int fo=0;
 
@@ -25,12 +25,14 @@ int main(int argc,char *argv[]){
 	time_t timer;
 	struct tm *t_st;
 	int playfirst;
-
-    srand((unsigned)time(NULL));
+	int seed;
+	seed = (unsigned)time(NULL);
+	//seed = 1509347469;
+	srand(seed);
 
 	/*ゲーム開始処理*/{
 	//この処理は開発時に不要なためコメントアウト
-	if (1){
+	if (0){
 		printf("最大ターンを入力してください\n");
 		scanf("%d",&MAX);
 	}
@@ -67,7 +69,7 @@ int main(int argc,char *argv[]){
 
 		printf("棋譜ファイルを使用しません\n");
 	}
-	srand((unsigned)time(NULL));
+	//srand((unsigned)time(NULL));
 	printboard();
 
 	//この処理は先手後手を決めるための処理
@@ -84,6 +86,7 @@ int main(int argc,char *argv[]){
 }	/*ゲーム開始処理おわり*/
 
 	while(turn<MAX+1){  //ゲーム
+		printf("\n\n");
 		X=turnstart(turn);
 		if(turn%2==1){
 			printf("X? ");
@@ -97,21 +100,31 @@ int main(int argc,char *argv[]){
 
 		switch(GAMEMODE){
 			case 1:
-				X=iputprocess(X, input);
-				break;
+			X=iputprocess(X, input);
+			break;
 			case 2:
-				if((playfirst+turn)%2==1){
-					X=iputprocess(X, input);
-				}else{
-					X=com_plays();
-				}
-				break;
-			case 3:
+			if((playfirst+turn)%2==1){
+				X=iputprocess(X, input);
+			}else{
 				X=com_plays();
+				printf("%d",X);
+				if(X<0||11<X){
+					printf("com retires\n");
+					break;
+				}
+			}
+			break;
+			case 3:
+			X=com_plays();
+			if(X<0||11<X){
+				printf("com retires\n");
 				break;
+			}
+				printf("%d",X);
+			break;
 
 			default:
-				X=iputprocess(X, input);
+			X=iputprocess(X, input);
 
 		}
 
@@ -135,8 +148,12 @@ int main(int argc,char *argv[]){
 	}
 	/////////////////////////////////////////////////ゲーム終了処理
 
-	end_printboard(X,victory_decision());		///end_printboardをつくる
+	end_printboard();		///end_printboardをつくる
 	game_end_message(turn);
+	if(GAMEMODE!=1){
+		printf("seed is %d\n",seed);
+
+	}
 	if(fo==1){
 		fclose(fp);
 	}
